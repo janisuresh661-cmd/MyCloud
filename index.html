@@ -647,6 +647,9 @@ const phone=rawPhone.startsWith('+91')
     authMessage.style.color='#087ff5';
     authMessage.textContent='Login successful!';
 
+loginBtn.textContent='Logout';
+loginBtn.dataset.loggedIn='true';
+    
     setTimeout(()=>{
       authOverlay.classList.remove('show');
       authMessage.textContent='';
@@ -661,7 +664,30 @@ const phone=rawPhone.startsWith('+91')
   }
 });
   
-loginBtn.addEventListener('click',()=>{
+loginBtn.addEventListener('click',async()=>{
+  if(loginBtn.dataset.loggedIn==='true'){
+    const token=localStorage.getItem('mycloud_session');
+
+    try{
+      await fetch(`${API_URL}/api/logout`,{
+        method:'POST',
+        headers:{
+          'Authorization':`Bearer ${token}`
+        }
+      });
+    }catch(error){
+      // Continue with local logout even if the request fails
+    }
+
+    localStorage.removeItem('mycloud_session');
+
+    loginBtn.textContent='Login';
+    loginBtn.dataset.loggedIn='false';
+
+    showToast('Logged out successfully');
+    return;
+  }
+
   authOverlay.classList.add('show');
 });
 
@@ -674,6 +700,35 @@ authOverlay.addEventListener('click',e=>{
     authOverlay.classList.remove('show');
   }
 });
+
+  async function restoreSession(){
+  const token = localStorage.getItem('mycloud_session');
+
+  if(!token) return;
+
+  try{
+    const response = await fetch(`${API_URL}/api/me`, {
+      headers:{
+        'Authorization':`Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if(response.ok && data.ok){
+      loginBtn.textContent='Logout';
+      loginBtn.dataset.loggedIn='true';
+    }else{
+      localStorage.removeItem('mycloud_session');
+      loginBtn.textContent='Login';
+      loginBtn.dataset.loggedIn='false';
+    }
+  }catch(error){
+    // Keep the stored session if the server is temporarily unavailable
+  }
+}
+
+restoreSession();
 
 render();
 </script>
