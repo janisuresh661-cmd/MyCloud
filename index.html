@@ -214,6 +214,120 @@ main{width:min(1160px,92%);margin:0 auto;padding:38px 0 30px}
   background:#066fd8;
 }
 
+.auth-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(7,17,31,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:200;
+}
+
+.auth-overlay.show{
+  display:flex;
+}
+
+.auth-card{
+  width:min(420px,100%);
+  background:#fff;
+  border:1px solid #dce8f5;
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 20px 60px rgba(28,91,151,.2);
+  position:relative;
+}
+
+.auth-close{
+  position:absolute;
+  top:12px;
+  right:14px;
+  width:38px;
+  height:38px;
+  border:0;
+  background:transparent;
+  color:#59708f;
+  font-size:28px;
+  border-radius:50%;
+}
+
+.auth-close:hover{
+  background:#edf6ff;
+  color:#087ff5;
+}
+
+.auth-title{
+  font-size:25px;
+  font-weight:800;
+  color:#0b1730;
+  margin-bottom:7px;
+  padding-right:35px;
+}
+
+.auth-title span{
+  color:#087ff5;
+}
+
+.auth-subtitle{
+  color:#59708f;
+  font-size:15px;
+  margin-bottom:22px;
+}
+
+.auth-card input{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #d6e3f0;
+  border-radius:12px;
+  outline:none;
+  margin-bottom:12px;
+  color:#0b1730;
+  background:#fff;
+}
+
+.auth-card input:focus{
+  border-color:#087ff5;
+  box-shadow:0 0 0 3px rgba(8,127,245,.1);
+}
+
+.auth-main-btn{
+  width:100%;
+  border:0;
+  background:#087ff5;
+  color:#fff;
+  border-radius:12px;
+  padding:13px;
+  font-weight:700;
+  margin-top:4px;
+}
+
+.auth-main-btn:hover{
+  background:#066fd8;
+}
+
+.auth-link{
+  display:block;
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#087ff5;
+  padding:9px 5px;
+  font-size:14px;
+}
+
+.auth-link:hover{
+  text-decoration:underline;
+}
+
+.auth-message{
+  min-height:20px;
+  margin-top:12px;
+  text-align:center;
+  font-size:14px;
+  color:#ef3038;
+}
+  
 </style>
 </head>
 <body>
@@ -285,6 +399,102 @@ main{width:min(1160px,92%);margin:0 auto;padding:38px 0 30px}
 </main>
 </div>
 
+  <div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <button class="auth-close" id="authClose">×</button>
+
+    <div class="auth-title">Welcome to <span>MyCloud</span></div>
+    <p class="auth-subtitle" id="authSubtitle">Login to access your files</p>
+
+    <div id="loginForm">
+      <input
+        type="tel"
+        id="loginPhone"
+        placeholder="Phone number"
+        inputmode="numeric"
+        maxlength="10"
+      >
+
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Password"
+      >
+
+      <button class="auth-main-btn" id="loginSubmit">Login</button>
+
+      <button class="auth-link" id="showRegister">
+        Create a new account
+      </button>
+
+      <button class="auth-link" id="showForgot">
+        Forgot password?
+      </button>
+    </div>
+
+    <div id="registerForm" style="display:none">
+      <input
+        type="tel"
+        id="registerPhone"
+        placeholder="Phone number"
+        inputmode="numeric"
+        maxlength="10"
+      >
+
+      <input
+        type="password"
+        id="registerPassword"
+        placeholder="Create password"
+      >
+
+      <input
+        type="password"
+        id="registerConfirm"
+        placeholder="Confirm password"
+      >
+
+      <button class="auth-main-btn" id="registerSubmit">
+        Create Account
+      </button>
+
+      <button class="auth-link" id="showLogin">
+        Already have an account? Login
+      </button>
+    </div>
+
+    <div id="forgotForm" style="display:none">
+      <input
+        type="tel"
+        id="forgotPhone"
+        placeholder="Phone number"
+        inputmode="numeric"
+        maxlength="10"
+      >
+
+      <input
+        type="text"
+        id="recoveryCode"
+        placeholder="Recovery code"
+      >
+
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="New password"
+      >
+
+      <button class="auth-main-btn" id="forgotSubmit">
+        Reset Password
+      </button>
+
+      <button class="auth-link" id="backToLogin">
+        Back to Login
+      </button>
+    </div>
+
+    <div class="auth-message" id="authMessage"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -381,6 +591,24 @@ window.deleteFile=function(i){
 document.getElementById('clearHistory').addEventListener('click',()=>{
   if(!history.length){showToast('History is already empty');return}
   if(confirm('Clear all download history?')){history.length=0;render();showToast('Download history cleared')}
+});
+
+const authOverlay=document.getElementById('authOverlay');
+const loginBtn=document.getElementById('loginBtn');
+const authClose=document.getElementById('authClose');
+
+loginBtn.addEventListener('click',()=>{
+  authOverlay.classList.add('show');
+});
+
+authClose.addEventListener('click',()=>{
+  authOverlay.classList.remove('show');
+});
+
+authOverlay.addEventListener('click',e=>{
+  if(e.target===authOverlay){
+    authOverlay.classList.remove('show');
+  }
 });
 
 render();
