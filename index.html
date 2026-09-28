@@ -596,7 +596,71 @@ document.getElementById('clearHistory').addEventListener('click',()=>{
 const authOverlay=document.getElementById('authOverlay');
 const loginBtn=document.getElementById('loginBtn');
 const authClose=document.getElementById('authClose');
+  
+const loginPhone=document.getElementById('loginPhone');
+const loginPassword=document.getElementById('loginPassword');
+const loginSubmit=document.getElementById('loginSubmit');
+const authMessage=document.getElementById('authMessage');
 
+const API_URL='https://mycloud-api.janisuresh661.workers.dev';
+loginSubmit.addEventListener('click',async()=>{
+  const rawPhone=loginPhone.value.trim();
+const phone=rawPhone.startsWith('+91')
+  ? rawPhone.substring(1)
+  : rawPhone.startsWith('91')
+    ? rawPhone
+    : '91'+rawPhone;
+  
+  const password=loginPassword.value;
+
+  authMessage.textContent='';
+
+  if(!phone||!password){
+    authMessage.textContent='Please enter your phone number and password.';
+    return;
+  }
+
+  loginSubmit.disabled=true;
+  loginSubmit.textContent='Logging in...';
+
+  try{
+    const response=await fetch(`${API_URL}/api/login`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        phone,
+        password
+      })
+    });
+
+    const data=await response.json();
+
+    if(!response.ok||!data.ok){
+      authMessage.textContent=data.message||'Login failed.';
+      return;
+    }
+
+    localStorage.setItem('mycloud_session',data.sessionToken);
+
+    authMessage.style.color='#087ff5';
+    authMessage.textContent='Login successful!';
+
+    setTimeout(()=>{
+      authOverlay.classList.remove('show');
+      authMessage.textContent='';
+      authMessage.style.color='#ef3038';
+    },800);
+
+  }catch(error){
+    authMessage.textContent='Unable to connect to MyCloud.';
+  }finally{
+    loginSubmit.disabled=false;
+    loginSubmit.textContent='Login';
+  }
+});
+  
 loginBtn.addEventListener('click',()=>{
   authOverlay.classList.add('show');
 });
