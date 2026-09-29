@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="description" content="MyCloud - secure personal cloud storage">
+<title>MyCloud</title>
+<style>
+:root{--blue:#2563eb;--blue2:#1d4ed8;--soft:#eff6ff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--bg:#f7f9fc;--danger:#dc2626;--ok:#15803d;--shadow:0 10px 30px rgba(15,23,42,.07);--r:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.6;cursor:not-allowed}
+.app{width:min(1180px,100%);margin:auto;padding:18px 16px 30px}header{min-height:62px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.brand{font-size:27px;font-weight:800;letter-spacing:-.8px}.header-actions{display:flex;gap:9px}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s}.btn:hover{transform:translateY(-1px)}.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}.danger{background:#fef2f2;color:var(--danger);border:1px solid #fecaca}.small{padding:8px 11px;font-size:13px;border-radius:10px}.hidden{display:none!important}
+main{display:grid;gap:18px}.welcome,.card{background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}.welcome{padding:22px;background:linear-gradient(135deg,#fff,#f8fbff)}.welcome h1{margin:0 0 5px;font-size:25px}.welcome p{margin:0;color:var(--muted)}
+.card{overflow:hidden}.head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}.title{margin:0;font-size:18px}.body{padding:20px}
+.storage-number{font-size:25px;font-weight:800}.muted{color:var(--muted);font-size:13px}.progress{height:9px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:11px}.progress span{display:block;height:100%;width:0;background:var(--blue);border-radius:99px;transition:width .3s}
+.drop{border:2px dashed #bfdbfe;background:#f8fbff;border-radius:16px;padding:28px 18px;text-align:center;transition:.18s}.drop.drag{border-color:var(--blue);background:var(--soft)}.upload-icon{width:52px;height:52px;border-radius:15px;margin:0 auto 12px;display:grid;place-items:center;background:var(--soft);color:var(--blue);font-size:25px}.drop h3{margin:0 0 5px}.drop p{margin:0 0 15px;color:var(--muted);font-size:14px}.drop input{display:none}
+.list{display:grid;gap:10px}.empty{padding:30px 15px;text-align:center;color:var(--muted)}.row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:13px;border:1px solid var(--border);border-radius:14px}.icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--soft);color:var(--blue);font-weight:800}.name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.meta{margin-top:3px;color:var(--muted);font-size:12px}.actions{display:flex;gap:7px}.iconbtn{width:38px;height:38px;border:1px solid var(--border);border-radius:10px;background:#fff;display:grid;place-items:center;font-size:17px}.iconbtn:hover{background:#f8fafc}.iconbtn.del:hover{background:#fef2f2;color:var(--danger);border-color:#fecaca}
+footer{text-align:center;color:var(--muted);padding:28px 10px 5px;font-size:13px}footer strong{font-size:16px;color:var(--text)}
+.overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(15,23,42,.55);backdrop-filter:blur(7px)}.overlay.show{display:flex}.modal{width:min(430px,100%);background:#fff;border-radius:22px;padding:24px;box-shadow:0 25px 70px rgba(0,0,0,.22)}.modaltop{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:18px}.modaltop h2{margin:0 0 5px}.modaltop p{margin:0;color:var(--muted);font-size:13px}.close{border:0;background:#f3f4f6;border-radius:10px;width:36px;height:36px;font-size:19px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin-bottom:18px}.tab{border:0;background:transparent;padding:10px;border-radius:9px;font-weight:700;color:var(--muted)}.tab.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.06)}.field{margin-bottom:14px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input{width:100%;border:1px solid var(--border);border-radius:11px;padding:12px 13px;outline:0}.field input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}.submit{width:100%;margin-top:4px}.msg{min-height:20px;margin:10px 0 0;text-align:center;font-size:13px;color:var(--danger)}
+.loading{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.7);backdrop-filter:blur(3px)}.loading.show{display:flex}.spinner{width:42px;height:42px;border:4px solid #dbeafe;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:20px;z-index:300;transform:translate(-50%,120px);max-width:min(92vw,500px);background:#111827;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.2);opacity:0;transition:.25s;text-align:center;font-size:14px}.toast.show{transform:translate(-50%,0);opacity:1}.toast.success{background:#166534}.toast.error{background:#991b1b}.confirm-text{color:var(--muted);line-height:1.5;font-size:14px}.confirm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+@media(max-width:700px){.app{padding:10px 11px 24px}.brand{font-size:24px}.header-actions .btn{padding:9px 12px}.welcome{padding:18px}.welcome h1{font-size:21px}.head,.body{padding:15px}.storage{grid-template-columns:1fr}.row{grid-template-columns:auto 1fr}.actions{grid-column:2;justify-content:flex-end}.drop{padding:23px 12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">MyCloud</div><div class="header-actions"><button id="loginBtn" class="btn primary">Login</button><button id="logoutBtn" class="btn secondary hidden">Logout</button></div></header>
+<main>
+<section class="welcome"><h1 id="welcomeTitle">Your personal cloud</h1><p id="welcomeText">Securely upload, store and access your files from any device.</p></section>
+<section class="card"><div class="head"><h2 class="title">Storage</h2><span id="storagePercent" class="muted">0%</span></div><div class="body"><div id="storageText" class="storage-number">0 B / 600 MB</div><div class="muted">Your personal storage limit</div><div class="progress"><span id="storageBar"></span></div></div></section>
+<section class="card"><div class="head"><h2 class="title">Upload files</h2></div><div class="body"><div id="dropZone" class="drop"><div class="upload-icon">↑</div><h3>Upload to MyCloud</h3><p>Choose files from your phone or computer. Maximum storage: 600 MB.</p><button id="chooseFilesBtn" class="btn primary">Choose Files</button><input id="fileInput" type="file" multiple></div></div></section>
+<section class="card"><div class="head"><h2 class="title">Your files</h2><button id="refreshFilesBtn" class="btn secondary small">Refresh</button></div><div class="body"><div id="fileList" class="list"><div class="empty">Login to view your files.</div></div></div></section>
+<section class="card"><div class="head"><h2 class="title">Download history</h2><button id="clearHistoryBtn" class="btn danger small">Clear History</button></div><div class="body"><div id="historyList" class="list"><div class="empty">Login to view your download history.</div></div></div></section>
+</main>
+<footer>Designed And Evolved By <strong>Sukesh✨</strong></footer>
+</div>
+
+<div id="authOverlay" class="overlay" aria-hidden="true"><div class="modal">
+<div class="modaltop"><div><h2 id="authTitle">Welcome back</h2><p id="authSubtitle">Login to access your personal cloud.</p></div><button id="closeAuthBtn" class="close">×</button></div>
+<div class="tabs"><button id="loginTab" class="tab active">Login</button><button id="registerTab" class="tab">Create account</button></div>
+<form id="authForm">
+<div class="field"><label for="userIdInput">User ID</label><input id="userIdInput" type="text" autocomplete="username" required></div>
+<div class="field"><label for="passwordInput">Password</label><input id="passwordInput" type="password" autocomplete="current-password" required></div>
+<div id="confirmPasswordWrap" class="field hidden"><label for="confirmPasswordInput">Confirm password</label><input id="confirmPasswordInput" type="password" autocomplete="new-password"></div>
+<button id="authSubmit" class="btn primary submit" type="submit">Login</button><p id="authMessage" class="msg"></p>
+</form>
+</div></div>
+
+<div id="confirmOverlay" class="overlay" aria-hidden="true"><div class="modal">
+<div class="modaltop"><div><h2 id="confirmTitle">Are you sure?</h2><p id="confirmText" class="confirm-text"></p></div><button id="closeConfirmBtn" class="close">×</button></div>
+<div class="confirm-actions"><button id="cancelConfirmBtn" class="btn secondary">Cancel</button><button id="acceptConfirmBtn" class="btn danger">Confirm</button></div>
+</div></div>
+
+<div id="loading" class="loading"><div class="spinner"></div></div><div id="toast" class="toast"></div>
+
+<script>
+"use strict";
+
+const API_URL="https://mycloud-api.janisuresh661.workers.dev";
+const STORAGE_LIMIT=600*1024*1024;
+const SESSION_KEY="mycloud_session";
+const $=id=>document.getElementById(id);
+
+const loginBtn=$("loginBtn"),logoutBtn=$("logoutBtn"),loginTab=$("loginTab"),registerTab=$("registerTab");
+const authOverlay=$("authOverlay"),closeAuthBtn=$("closeAuthBtn"),authForm=$("authForm"),authTitle=$("authTitle"),authSubtitle=$("authSubtitle"),authSubmit=$("authSubmit"),authMessage=$("authMessage");
+const userIdInput=$("userIdInput"),passwordInput=$("passwordInput"),confirmPasswordWrap=$("confirmPasswordWrap"),confirmPasswordInput=$("confirmPasswordInput");
+const fileInput=$("fileInput"),chooseFilesBtn=$("chooseFilesBtn"),dropZone=$("dropZone"),fileList=$("fileList"),historyList=$("historyList"),refreshFilesBtn=$("refreshFilesBtn"),clearHistoryBtn=$("clearHistoryBtn");
+const storageText=$("storageText"),storagePercent=$("storagePercent"),storageBar=$("storageBar"),welcomeTitle=$("welcomeTitle"),welcomeText=$("welcomeText");
+const loading=$("loading"),toast=$("toast"),confirmOverlay=$("confirmOverlay"),confirmTitle=$("confirmTitle"),confirmText=$("confirmText"),closeConfirmBtn=$("closeConfirmBtn"),cancelConfirmBtn=$("cancelConfirmBtn"),acceptConfirmBtn=$("acceptConfirmBtn");
+
+let authMode="login",files=[],history=[],currentUser=null,confirmAction=null,toastTimer;
+
+function token(){return localStorage.getItem(SESSION_KEY)}
+function setToken(v){v?localStorage.setItem(SESSION_KEY,v):localStorage.removeItem(SESSION_KEY)}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function bytes(n){n=Number(n)||0;if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(1)+" KB";if(n<1073741824)return(n/1048576).toFixed(2)+" MB";return(n/1073741824).toFixed(2)+" GB"}
+function date(v){if(!v)return"Unknown date";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleString()}
+function fname(f){return f.filename||f.name||f.originalName||"Unnamed file"}
+function fid(f){return f.id??f.fileId??f.file_id}
+function toastMsg(msg,type=""){clearTimeout(toastTimer);toast.textContent=msg;toast.className="toast show"+(type?" "+type:"");toastTimer=setTimeout(()=>toast.className="toast",3200)}
+function busy(v){loading.classList.toggle("show",v)}
+function showAuth(mode="login"){setMode(mode);authOverlay.classList.add("show");authOverlay.setAttribute("aria-hidden","false");setTimeout(()=>userIdInput.focus(),50)}
+function hideAuth(){authOverlay.classList.remove("show");authOverlay.setAttribute("aria-hidden","true");authMessage.textContent=""}
+function setMode(mode){authMode=mode;const r=mode==="register";loginTab.classList.toggle("active",!r);registerTab.classList.toggle("active",r);confirmPasswordWrap.classList.toggle("hidden",!r);confirmPasswordInput.required=r;if(r){authTitle.textContent="Create your account";authSubtitle.textContent="Create a private MyCloud account.";authSubmit.textContent="Create account";passwordInput.autocomplete="new-password"}else{authTitle.textContent="Welcome back";authSubtitle.textContent="Login to access your personal cloud.";authSubmit.textContent="Login";passwordInput.autocomplete="current-password"}authMessage.textContent=""}
+function confirm(title,msg,action){confirmTitle.textContent=title;confirmText.textContent=msg;confirmAction=action;confirmOverlay.classList.add("show");confirmOverlay.setAttribute("aria-hidden","false")}
+function closeConfirm(){confirmOverlay.classList.remove("show");confirmOverlay.setAttribute("aria-hidden","true");confirmAction=null}
+
+async function parse(res){const text=await res.text();let data={};try{data=text?JSON.parse(text):{}}catch{data={raw:text}}return{res,data}}
+async function api(path,opt={}){const h=new Headers(opt.headers||{}),t=token();if(t&&!h.has("Authorization"))h.set("Authorization","Bearer "+t);if(opt.body&&typeof opt.body==="string"&&!h.has("Content-Type"))h.set("Content-Type","application/json");const r=await fetch(API_URL+path,{...opt,headers:h});const x=await parse(r);if(r.status===401){setToken(null);currentUser=null;updateUI()}return x}
+
+function updateUI(){const ok=!!(token()&&currentUser);loginBtn.classList.toggle("hidden",ok);logoutBtn.classList.toggle("hidden",!ok);if(ok){const n=currentUser.userId||currentUser.user_id||currentUser.username||"there";welcomeTitle.textContent="Welcome, "+n;welcomeText.textContent="Your files are private to your account and available from any device."}else{welcomeTitle.textContent="Your personal cloud";welcomeText.textContent="Securely upload, store and access your files from any device."}}
+
+async function login(uid,pw){const{res,data}=await api("/api/login",{method:"POST",body:JSON.stringify({userId:uid,password:pw})});if(!res.ok||!data.ok)throw Error(data.message||data.error||"Login failed.");const t=data.sessionToken||data.token||data.session||data.accessToken;if(!t)throw Error("Login succeeded but no session token was returned.");setToken(t);currentUser=data.user||{userId:data.userId||uid};updateUI();hideAuth();await refreshAll();toastMsg("Logged in successfully","success")}
+async function register(uid,pw){const{res,data}=await api("/api/register",{method:"POST",body:JSON.stringify({userId:uid,password:pw})});if(!res.ok||!data.ok)throw Error(data.message||data.error||"Account creation failed.");const t=data.sessionToken||data.token||data.session||data.accessToken;if(t){setToken(t);currentUser=data.user||{userId:uid};updateUI();hideAuth();await refreshAll();toastMsg("Account created successfully","success")}else{setMode("login");userIdInput.value=uid;passwordInput.value="";toastMsg("Account created. Please login.","success")}}
+async function restore(){if(!token()){updateUI();renderFiles();renderHistory();updateStorage();return}try{const{res,data}=await api("/api/me");if(!res.ok||!data.ok){setToken(null);currentUser=null;updateUI();renderFiles();renderHistory();updateStorage();return}currentUser=data.user||data;updateUI();await refreshAll()}catch(e){console.error(e);setToken(null);currentUser=null;updateUI();renderFiles();renderHistory();updateStorage()}}
+async function logout(){try{if(token())await api("/api/logout",{method:"POST"})}catch(e){console.error(e)}setToken(null);currentUser=null;files=[];history=[];updateUI();renderFiles();renderHistory();updateStorage();toastMsg("Logged out")}
+
+async function loadFiles(){if(!token()){files=[];renderFiles();updateStorage();return}const{res,data}=await api("/api/files");if(!res.ok||!data.ok)throw Error(data.message||data.error||"Could not load files.");files=Array.isArray(data.files)?data.files:Array.isArray(data.data)?data.data:Array.isArray(data)?data:[];renderFiles();updateStorage()}
+async function loadHistory(){if(!token()){history=[];renderHistory();return}for(const path of["/api/history","/api/download-history"]){try{const{res,data}=await api(path);if(res.status===404)continue;if(!res.ok||!data.ok)throw Error(data.message||data.error||"Could not load history.");history=Array.isArray(data.history)?data.history:Array.isArray(data.downloadHistory)?data.downloadHistory:Array.isArray(data.data)?data.data:Array.isArray(data)?data:[];renderHistory();return}catch(e){console.error(e)}}history=[];renderHistory()}
+async function refreshAll(){if(!token())return;try{await Promise.all([loadFiles(),loadHistory()])}catch(e){console.error(e);toastMsg(e.message||"Could not refresh MyCloud","error")}}
+
+async function addFiles(selected){
+ if(!token()){toastMsg("Please login first");showAuth("login");return}
+ if(!selected.length)return;
+ for(const file of selected){
+  try{
+   if(file.size>STORAGE_LIMIT){toastMsg(file.name+" is larger than the 600 MB limit.","error");continue}
+   toastMsg("Preparing "+file.name+"...");
+   const r=await fetch(API_URL+"/api/files/upload-url",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token()},body:JSON.stringify({filename:file.name,fileSize:file.size,contentType:file.type||"application/octet-stream"})});
+   const{res:ur,data:u}=await parse(r);
+   if(!ur.ok||!u.ok){toastMsg(u.message||u.error||"Could not prepare upload.","error");continue}
+   if(!u.uploadUrl||!u.objectKey){toastMsg("Server did not return a valid upload URL.","error");continue}
+   toastMsg("Uploading "+file.name+"...");
+   const up=await fetch(u.uploadUrl,{method:"PUT",headers:{"Content-Type":file.type||"application/octet-stream"},body:file});
+   if(!up.ok){const t=await up.text().catch(()=>""),m=t||"Storage service rejected the upload.";console.error("B2 upload error:",up.status,t);toastMsg("Upload failed ("+up.status+"): "+m,"error");continue}
+   toastMsg("Finalizing "+file.name+"...");
+   const cr=await fetch(API_URL+"/api/files/complete",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token()},body:JSON.stringify({objectKey:u.objectKey})});
+   const{res:rr,data:c}=await parse(cr);
+   if(!rr.ok||!c.ok){toastMsg(c.message||c.error||"Could not complete upload.","error");continue}
+   toastMsg(file.name+" uploaded successfully","success");await loadFiles();
+  }catch(e){console.error("Upload error:",e);toastMsg("Upload failed: "+(e.message||"Unknown error"),"error")}
+ }
+ fileInput.value=""
+}
+
+async function downloadUrl(f){
+ const id=fid(f),key=f.storage_key||f.storageKey||f.objectKey,attempts=[];
+ if(id!=null){attempts.push({p:"/api/files/download-url",o:{method:"POST",body:JSON.stringify({fileId:id})}});attempts.push({p:"/api/files/"+encodeURIComponent(id)+"/download-url",o:{method:"GET"}});attempts.push({p:"/api/files/"+encodeURIComponent(id)+"/download",o:{method:"GET"}})}
+ if(key)attempts.push({p:"/api/files/download-url",o:{method:"POST",body:JSON.stringify({objectKey:key})}});
+ let last=null;
+ for(const a of attempts){try{const{res,data}=await api(a.p,a.o);if(res.status===404)continue;if(res.ok){const u=data.downloadUrl||data.url||data.signedUrl||data.presignedUrl;if(u)return u;if(res.redirected&&res.url)return res.url}last=Error(data.message||data.error||"Could not create download URL.")}catch(e){last=e}}
+ throw last||Error("Download endpoint was not available.")
+}
+async function downloadFile(f){if(!token()){showAuth("login");return}try{toastMsg("Preparing download...");const u=await downloadUrl(f);const a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener";a.download=fname(f);document.body.appendChild(a);a.click();a.remove();toastMsg("Download started.","success");await loadHistory()}catch(e){console.error(e);toastMsg(e.message||"Download failed.","error")}}
+async function deleteFile(f){const id=fid(f),key=f.storage_key||f.storageKey||f.objectKey;if(id==null&&!key){toastMsg("This file cannot be deleted because its ID is missing.","error");return}confirm("Delete file?",'"'+fname(f)+'" will be permanently deleted and its storage will be freed.',async()=>{try{busy(true);const a=[];if(id!=null){a.push({p:"/api/files/"+encodeURIComponent(id),o:{method:"DELETE"}});a.push({p:"/api/files/delete",o:{method:"POST",body:JSON.stringify({fileId:id})}})}if(key)a.push({p:"/api/files/delete",o:{method:"POST",body:JSON.stringify({objectKey:key})}});let done=false,last=null;for(const x of a){const{res,data}=await api(x.p,x.o);if(res.status===404)continue;if(res.ok&&data.ok!==false){done=true;break}last=Error(data.message||data.error||"Could not delete file.")}if(!done)throw last||Error("Delete endpoint was not available.");toastMsg("File deleted and storage freed.","success");await refreshAll()}catch(e){console.error(e);toastMsg(e.message||"Could not delete file.","error")}finally{busy(false)}})}
+async function clearHistory(){if(!token()){showAuth("login");return}confirm("Clear download history?","Only the history entries will be removed. Your files will not be deleted.",async()=>{try{busy(true);let done=false,last=null;for(const p of["/api/history","/api/download-history"]){const{res,data}=await api(p,{method:"DELETE"});if(res.status===404)continue;if(res.ok&&data.ok!==false){done=true;break}last=Error(data.message||data.error||"Could not clear history.")}if(!done)throw last||Error("History endpoint was not available.");history=[];renderHistory();toastMsg("Download history cleared.","success")}catch(e){console.error(e);toastMsg(e.message||"Could not clear history.","error")}finally{busy(false)}})}
+
+function updateStorage(){let used=Number(currentUser?.storageUsed??currentUser?.storage_used??currentUser?.usedStorage)||0;if(!used)used=files.reduce((s,f)=>s+(Number(f.file_size??f.fileSize??f.size)||0),0);const p=Math.min(100,Math.max(0,used/STORAGE_LIMIT*100));storageText.textContent=bytes(used)+" / "+bytes(STORAGE_LIMIT);storagePercent.textContent=p.toFixed(p<10?1:0)+"%";storageBar.style.width=p+"%"}
+function icon(f){const t=String(f.mime_type||f.mimeType||"").toLowerCase(),n=fname(f).toLowerCase();if(t.startsWith("image/")||/\.(jpg|jpeg|png|gif|webp|svg)$/.test(n))return"▧";if(t.startsWith("video/")||/\.(mp4|mkv|mov|webm)$/.test(n))return"▶";if(t.startsWith("audio/")||/\.(mp3|wav|m4a|ogg)$/.test(n))return"♪";if(t.includes("pdf")||/\.pdf$/.test(n))return"PDF";if(/\.(zip|rar|7z|tar|gz)$/.test(n))return"ZIP";if(/\.(doc|docx)$/.test(n))return"DOC";if(/\.(xls|xlsx|csv)$/.test(n))return"XLS";return"FILE"}
+function renderFiles(){if(!token()){fileList.innerHTML='<div class="empty">Login to view your files.</div>';return}if(!files.length){fileList.innerHTML='<div class="empty">No files yet. Upload your first file above.</div>';return}fileList.innerHTML=files.map((f,i)=>'<div class="row"><div class="icon">'+esc(icon(f))+'</div><div><div class="name" title="'+esc(fname(f))+'">'+esc(fname(f))+'</div><div class="meta">'+bytes(f.file_size??f.fileSize??f.size??0)+" · "+esc(date(f.uploaded_at||f.uploadedAt||f.created_at||f.createdAt))+'</div></div><div class="actions"><button class="iconbtn" data-a="download" data-i="'+i+'" title="Download">↓</button><button class="iconbtn del" data-a="delete" data-i="'+i+'" title="Delete">×</button></div></div>').join("")}
+function renderHistory(){if(!token()){historyList.innerHTML='<div class="empty">Login to view your download history.</div>';return}if(!history.length){historyList.innerHTML='<div class="empty">No downloads yet.</div>';return}historyList.innerHTML=history.map(x=>{const n=x.filename||x.fileName||x.name||x.file?.filename||"Downloaded file",d=x.downloaded_at||x.downloadedAt||x.created_at||x.createdAt;return'<div class="row"><div class="icon">↓</div><div><div class="name">'+esc(n)+'</div><div class="meta">'+esc(date(d))+'</div></div><div class="meta">Downloaded</div></div>'}).join("")}
+
+chooseFilesBtn.addEventListener("click",()=>token()?fileInput.click():showAuth("login"));
+fileInput.addEventListener("change",e=>addFiles([...e.target.files]));
+["dragenter","dragover"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();if(token())dropZone.classList.add("drag")}));
+["dragleave","drop"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();dropZone.classList.remove("drag")}));
+dropZone.addEventListener("drop",e=>token()?addFiles([...e.dataTransfer.files]):showAuth("login"));
+
+loginBtn.addEventListener("click",()=>showAuth("login"));
+logoutBtn.addEventListener("click",logout);
+loginTab.addEventListener("click",()=>setMode("login"));
+registerTab.addEventListener("click",()=>setMode("register"));
+closeAuthBtn.addEventListener("click",hideAuth);
+authOverlay.addEventListener("click",e=>{if(e.target===authOverlay)hideAuth()});
+
+authForm.addEventListener("submit",async e=>{e.preventDefault();const uid=userIdInput.value.trim(),pw=passwordInput.value,cp=confirmPasswordInput.value;if(!uid||!pw){authMessage.textContent="Please enter your User ID and password.";return}if(authMode==="register"&&pw!==cp){authMessage.textContent="Passwords do not match.";return}authSubmit.disabled=true;authMessage.textContent="";try{authMode==="register"?await register(uid,pw):await login(uid,pw);authForm.reset()}catch(err){console.error("Authentication error:",err);authMessage.textContent=err.message||"Something went wrong. Please try again."}finally{authSubmit.disabled=false}});
+
+fileList.addEventListener("click",async e=>{const b=e.target.closest("button[data-a]");if(!b)return;const f=files[Number(b.dataset.i)];if(!f)return;if(b.dataset.a==="download")await downloadFile(f);if(b.dataset.a==="delete")await deleteFile(f)});
+refreshFilesBtn.addEventListener("click",async()=>{if(!token()){showAuth("login");return}try{busy(true);await refreshAll();toastMsg("MyCloud refreshed.","success")}catch(e){toastMsg(e.message||"Refresh failed.","error")}finally{busy(false)}});
+clearHistoryBtn.addEventListener("click",clearHistory);
+closeConfirmBtn.addEventListener("click",closeConfirm);cancelConfirmBtn.addEventListener("click",closeConfirm);confirmOverlay.addEventListener("click",e=>{if(e.target===confirmOverlay)closeConfirm()});acceptConfirmBtn.addEventListener("click",async()=>{if(!confirmAction)return;const a=confirmAction;closeConfirm();await a()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){hideAuth();closeConfirm()}});
+
+updateUI();renderFiles();renderHistory();updateStorage();restore();
+</script>
+</body>
+</html>
