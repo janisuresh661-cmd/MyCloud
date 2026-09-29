@@ -645,9 +645,14 @@ async function addFiles(selected){
       });
 
       if(!uploadResponse.ok){
-        showToast(`Upload failed: ${file.name}`);
-        continue;
-      }
+  const errorText = await uploadResponse.text();
+  console.error('B2 upload error:', uploadResponse.status, errorText);
+
+  showToast(
+    `Upload failed (${uploadResponse.status}): ${errorText || 'Unknown error'}`
+  );
+  continue;
+}
 
       // 3. Tell MyCloud API to verify and finalize the upload
       showToast(`Finalizing ${file.name}...`);
