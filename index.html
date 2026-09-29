@@ -761,9 +761,10 @@ authOverlay.addEventListener('click',e=>{
   }
 }
 
-restoreSession();
-
-render();
+restoreSession().then(()=>{
+  loadFiles();
+  render();
+});
 </script>
 </body>
 </html>
