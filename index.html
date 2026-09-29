@@ -592,20 +592,119 @@ async function loadFiles(){
     historyList.innerHTML=history.slice().reverse().map(h=>`<div class="history-item"><strong>${escapeHtml(h.name)}</strong><small>${escapeHtml(h.time)}</small></div>`).join('');
   }
 }
-function addFiles(selected){
-  let used=files.reduce((a,f)=>a+f.size,0);
-  for(const file of selected){
-    if(used+file.size>LIMIT){showToast('Not enough storage for '+file.name);continue}
-    files.push({name:file.name,size:file.size,file,date:new Date().toLocaleString()});
-    used+=file.size;
+async function addFiles(selected){
+  const token=localStorage.getItem('mycloud_session');
+
+  if(!token){
+    showToast('Please login first');
+    authOverlay.classList.add('show');
+    return;
   }
-  render();
-  if(selected.length)showToast('File added to MyCloud');
+
+  if(!selected.length)return;
+
+  for(const file of selected){
+    try{
+      if(file.size>LIMIT){
+        showToast(`${file.name} is too large`);
+        continue;
+      }
+
+      showToast(`Preparing ${file.name}...`);
+
+      // 1. Ask MyCloud API for a secure B2 upload URL
+      const urlResponse=await fetch(`${API_URL}/api/files/upload-url`,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':`Bearer ${token}`
+        },
+        body:JSON.stringify({
+          filename:file.name,
+          fileSize:file.size,
+          contentType:file.type||'application/octet-stream'
+        })
+      });
+
+      const urlData=await urlResponse.json();
+
+      if(!urlResponse.ok||!urlData.ok){
+        showToast(urlData.message||'Could not prepare upload');
+        continue;
+      }
+
+      // 2. Upload the actual file directly to Backblaze B2
+      showToast(`Uploading ${file.name}...`);
+
+      const uploadResponse=await fetch(urlData.uploadUrl,{
+        method:'PUT',
+        headers:{
+          'Content-Type':file.type||'application/octet-stream'
+        },
+        body:file
+      });
+
+      if(!uploadResponse.ok){
+        showToast(`Upload failed: ${file.name}`);
+        continue;
+      }
+
+      // 3. Tell MyCloud API to verify and finalize the upload
+      showToast(`Finalizing ${file.name}...`);
+
+      const completeResponse=await fetch(`${API_URL}/api/files/complete`,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':`Bearer ${token}`
+        },
+        body:JSON.stringify({
+          objectKey:urlData.objectKey
+        })
+      });
+
+      const completeData=await completeResponse.json();
+
+      if(!completeResponse.ok||!completeData.ok){
+        showToast(completeData.message||'Could not complete upload');
+        continue;
+      }
+
+      showToast(`${file.name} uploaded successfully`);
+
+      // Refresh the real files from MyCloud
+      await loadFiles();
+
+    }catch(error){
+      console.error('Upload error:',error);
+      showToast(`Upload failed: ${file.name}`);
+    }
+  }
+
+  input.value='';
 }
-input.addEventListener('change',e=>addFiles([...e.target.files]));
-['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('drag')}));
-['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('drag')}));
-zone.addEventListener('drop',e=>addFiles([...e.dataTransfer.files]));
+
+input.addEventListener('change',e=>{
+  addFiles([...e.target.files]);
+});
+
+['dragenter','dragover'].forEach(ev=>{
+  zone.addEventListener(ev,e=>{
+    e.preventDefault();
+    zone.classList.add('drag');
+  });
+});
+
+['dragleave','drop'].forEach(ev=>{
+  zone.addEventListener(ev,e=>{
+    e.preventDefault();
+    zone.classList.remove('drag');
+  });
+});
+
+zone.addEventListener('drop',e=>{
+  addFiles([...e.dataTransfer.files]);
+});
 
 window.downloadFile=function(i){
   const f=files[i];
