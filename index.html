@@ -531,7 +531,40 @@ function icon(name){
   if(['zip','rar','7z'].includes(e))return '▦';
   return '▣';
 }
-function render(){
+async function loadFiles(){
+  const token=localStorage.getItem('mycloud_session');
+
+  if(!token)return;
+
+  try{
+    const response=await fetch(`${API_URL}/api/files`,{
+      method:'GET',
+      headers:{
+        'Authorization':`Bearer ${token}`
+      }
+    });
+
+    const data=await response.json();
+
+    if(!response.ok||!data.ok){
+      return;
+    }
+
+    files=data.files.map(f=>({
+      id:f.id,
+      name:f.filename,
+      size:f.file_size,
+      storageKey:f.storage_key,
+      type:f.mime_type,
+      date:new Date(f.uploaded_at).toLocaleString()
+    }));
+
+    render();
+  }catch(error){
+    console.error('Failed to load files:',error);
+  }
+}
+  function render(){
   const used=files.reduce((a,f)=>a+f.size,0);
   const pct=Math.min(100,used/LIMIT*100);
   storageText.textContent=`${fmt(used)} / 600 MB`;
