@@ -680,11 +680,13 @@ async function addFiles(selected){
       // Refresh the real files from MyCloud
       await loadFiles();
 
-    }catch(error){
-      console.error('Upload error:',error);
-      showToast(`Upload failed: ${file.name}`);
+   }catch(error){
+  console.error('Upload error:', error);
+
+  showToast(
+    `Upload failed: ${error.name || 'Error'} - ${error.message || 'Unknown error'}`
+  );
     }
-  }
 
   input.value='';
 }
